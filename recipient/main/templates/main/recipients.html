@@ -1,0 +1,23 @@
+{% extends 'main/layout.html' %}
+
+{% block title %}{{ title }}{% endblock title %}
+
+{% block content %}
+    {% if user.is_authenticated %}
+    <table border="1">
+        <caption>Список клиентов</caption>
+        <tr>
+            <th>ФИО</th>
+            <th>Пол</th>
+            <th>Дата обращения</th>
+        </tr>
+    {% for elem in cardRecipient%}
+    <tr>
+        <td>{{elem.fio}}</td>
+        <td>{{elem.gender}}</td>
+        <td>{{elem.date_of_appeal}}</td>
+    </tr>    
+    {% endfor %}
+    </table>
+    {% endif %}
+{% endblock content %}

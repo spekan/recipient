@@ -1,0 +1,23 @@
+{% extends 'main/layout.html' %}
+
+{% block title %}{{ title }}{% endblock title %}
+
+{% block content %}
+    {% if user.is_authenticated %}
+    <table border="1">
+        <caption>Список специалистов</caption>
+        <tr>
+            <th>Имя аккаунта</th>
+            <th>Имя специалиста</th>
+            <th>Фамилия специалиста</th>
+        </tr>
+    {% for elem in CustomUser%}
+    <tr>
+        <td>{{elem.user_name}}</td>
+        <td>{{elem.firstname}}</td>
+        <td>{{elem.lastname}}</td>
+    </tr>    
+    {% endfor %}
+    </table>
+    {% endif %}
+{% endblock content %}

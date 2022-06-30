@@ -1,0 +1,15 @@
+{% extends 'main/layout.html' %}
+
+{% block title %}Главная страница{% endblock title %}
+
+{% block content %}
+    <div class="features">
+        {% if user.is_authenticated %}
+            {% now "d.m.Y" as today_str %}
+            <h1>Сегодня: {{ today_str }}</h1>
+        {% else %}
+            <h1>Добро пожаловать!</h1>
+            <p>Для того, чтобы вы могли пользоваться данным ресурсом вам необходимо войти в аккаунт</p>
+        {% endif %}
+    </div>
+{% endblock content %}
