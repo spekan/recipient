@@ -1,0 +1,17 @@
+{% extends 'main/layout.html' %}
+
+{% block title %}{{ user_name.username }}{% endblock title %}
+
+{% block content %}
+    {% if user.is_authenticated %}
+        <h1 align="center">{{ user_name.first_name }} {{ user_name.last_name }}</h1>
+        <h3>Имя аккаунта: {{ user_name.username }}</h3>
+        <form target="_blank">
+            <input type="button" onclick="history.back();" value="Назад"/>
+            <input type="button" onclick="document.location='changepassword'" value="Поменять пароль"/>
+            {% if user.is_superuser %}
+                <input type="button" onclick="document.location='delete'" value="Удалить специалиста"/>
+            {% endif%}
+        </form>
+    {% endif %}
+{% endblock content %}

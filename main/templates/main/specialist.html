@@ -1,0 +1,14 @@
+{% extends 'main/layout.html' %}
+
+{% block title %}{{ title }}{% endblock title %}
+
+{% block content %}
+    {% if user.is_authenticated %}
+        <h1>Специалисты</h1>
+        <ul>
+        {% for elem in context %}
+            <li><a href="{% url 'main:some_specialist' elem.id %}">{{ elem.first_name }} {{ elem.last_name }}</a></li>
+        {% endfor %}
+        </ul>
+    {% endif %}
+{% endblock content %}
