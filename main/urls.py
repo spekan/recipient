@@ -10,6 +10,6 @@ urlpatterns = [
     path('login/', views.LoginFormView.as_view(), name='login'),
     path('specialists/', views.all_specialists, name="all_specialists"),
     path('specialists/<int:customuser_id>/', views.UserView.get_u, name='some_specialist'),
-    path('specialists/<int:customuser_id>/changepassword/', views.UserView.put, name='changepassword'),
+    path('specialists/<int:customuser_id>/changepassword/', views.changepassword, name='changepassword'),
     path('specialists/<int:customuser_id>/delete/', views.UserView.delete, name='delete'),
 ]

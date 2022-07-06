@@ -1,6 +1,6 @@
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.forms import AuthenticationForm
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.views.generic import TemplateView
 from django.views.generic.edit import FormView
 from django.contrib.messages import constants as messages
@@ -48,7 +48,31 @@ def all_specialists(request):
             'context': user_name
         }
         return render(request, 'main/specialist.html', context=context)
-        
+
+def changepassword(request, customuser_id):
+    current_user = CustomUser.objects.get(id=customuser_id)
+    template_name = 'main/changepassword.html'
+    text_action = ''  
+    if request.method == "POST":
+        form = ChangePasswordForm(request.POST)
+        if form.is_valid:
+            new_password=form.cleaned_data.get('new_password')
+            r_new_password=form.cleaned_data.get('retype_new_password')
+            if new_password==r_new_password:
+                current_user.set_password(new_password)
+                current_user.save()
+                messages.INFO("Пароль успешно изменен")
+                return redirect('/specialists/')
+            else:
+                text_action = "Пароли не совпадают"
+    form = ChangePasswordForm()
+    context ={
+        'title': 'Смена пароля', 
+        'form': form,
+        'text_action' : text_action,
+    }
+    return render(request, template_name, context)
+
 class UserView(TemplateView):
 
     template_name = 'main/some_specialist.html'    
@@ -72,7 +96,7 @@ class UserView(TemplateView):
         lastname=''
         passWord=''
         user_name = ''
-        form= UserForm(request.POST or None)
+        form= UserForm(request.POST)
         if form.is_valid():
             user_name=form.cleaned_data.get("user_name")
             firstname=form.cleaned_data.get("firstname")
@@ -88,22 +112,25 @@ class UserView(TemplateView):
         # Провалидировать данные - необязательно
         # user_to_create.save()
 
-    def put(self, request, customuser_id):
+    def put( request, customuser_id):
         template_name = 'main/changepassword.html'
         current_user = CustomUser.objects.filter(id=customuser_id)
         form = ChangePasswordForm(request.POST or None)
         submitbutton = request.POST.get("OK")
         new_password = ''
         r_new_password = ''
-        if form.is_valid:
-            new_password=form.cleaned_data.get("new_password")
-            r_new_password=form.cleaned_data.get("retype_new_password")
-        if new_password==r_new_password:
-            current_user.set_password(new_password)
-            current_user.save()
-            messages.INFO("Пароль успешно изменен")
+        if request.method == "POST":
+            if form.is_valid:
+                new_password=form.cleaned_data.get("new_password")
+                r_new_password=form.cleaned_data.get("retype_new_password")
+            if new_password==r_new_password:
+                current_user.set_password(new_password)
+                current_user.save()
+                messages.INFO("Пароль успешно изменен")
+            else:
+                messages.INFO("Пароли не совпадают")
         else:
-            messages.INFO("Пароли не совпадают")
+            form = ChangePasswordForm()
         context = {
             'title': 'Смена пароля',
         }

@@ -73,6 +73,13 @@ body{
     background: url(../img/logo.jpg) right bottom no-repeat;
     background-size: 15%;
 }
+.change body{
+  margin: 0%;
+  height: 100%;
+  background: url(../img/logo.jpg) right bottom no-repeat;
+  background-size: 15%;
+  text-align: center;
+}
 body p{
     padding-left: 20px;
 }
@@ -88,4 +95,12 @@ main .features{
   margin-top: 230px;
   text-align: center;
   width: 100%;
+}
+.change form {
+  display: inline-block;
+  margin-top: 20px;
+  width: 300px;
+}
+.change h1{
+  vertical-align: baseline;
 }
