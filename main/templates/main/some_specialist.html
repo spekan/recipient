@@ -8,8 +8,8 @@
         <h3>Имя аккаунта: {{ user_name.username }}</h3>
         <form target="_blank">
             <input type="button" onclick="history.back();" value="Назад"/>
-            <input type="button" onclick="document.location='changepassword'" value="Поменять пароль"/>
             {% if user.is_superuser %}
+                <input type="button" onclick="document.location='changepassword'" value="Поменять пароль"/>
                 <input type="button" onclick="document.location='delete'" value="Удалить специалиста"/>
             {% endif%}
         </form>

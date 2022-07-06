@@ -7,6 +7,5 @@ class UserForm(forms.Form):
     passWord = forms.CharField(max_length=25)
 
 class ChangePasswordForm(forms.Form):
-    current_password = forms.CharField(max_length=25)
     new_password = forms.CharField(max_length=25)
     retype_new_password = forms.CharField(max_length=25)

@@ -79,6 +79,7 @@ class UserView(TemplateView):
             lastname=form.cleaned_data.get("lastname")
             passWord=form.cleaned_data.get("passWord")
             new_user = CustomUser.objects.create(username=user_name,first_name=firstname, last_name=lastname, password=passWord, is_staff=True)
+            new_user.set_password(passWord)
             new_user.save()
         # Создать пользователя по данным с фронта
         # name = request.data.get('name')
@@ -87,31 +88,31 @@ class UserView(TemplateView):
         # Провалидировать данные - необязательно
         # user_to_create.save()
 
-    def put(self, request):
+    def put(self, request, customuser_id):
+        template_name = 'main/changepassword.html'
+        current_user = CustomUser.objects.filter(id=customuser_id)
+        form = ChangePasswordForm(request.POST or None)
         submitbutton = request.POST.get("OK")
-        if request.method=="POST":
-            password =request.user.password
-            username=request.user.username
-            form = ChangePasswordForm(request.POST or None)
-            c_password=form.cleaned_data.get("current_password")
+        new_password = ''
+        r_new_password = ''
+        if form.is_valid:
             new_password=form.cleaned_data.get("new_password")
             r_new_password=form.cleaned_data.get("retype_new_password")
-            user = authenticate(username=username, password=c_password)
-        if user is not None:
-            if new_password==r_new_password:
-                user = CustomUser.objects.get(username=username)
-                user.set_password(new_password)
-                user.save()
-                messages.INFO(request,"Пароль изменен")
-            else:
-                messages.INFO(request,"Пароли не совпадают")
+        if new_password==r_new_password:
+            current_user.set_password(new_password)
+            current_user.save()
+            messages.INFO("Пароль успешно изменен")
         else:
-            messages.INFO(request,"Неверный пароль")
+            messages.INFO("Пароли не совпадают")
+        context = {
+            'title': 'Смена пароля',
+        }
+        return render(request, template_name, context)
         # user_to_update = User.object.get(id=request.GET.get('user_id'))
         # user_to_update.name = request.data.get('name')
         # user_to_update.save()
     
-    def delete(request, customuser_id):
+    def delete(self, request, customuser_id):
         try:
             CustomUser.objects.filter(id=customuser_id).delete()     
             messages.INFO(request,"Успешно удален")       
