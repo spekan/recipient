@@ -5,7 +5,7 @@ from django.views.generic import TemplateView
 from django.views.generic.edit import FormView
 from django.contrib.messages import constants as messages
 from django.http import Http404
-from .forms import UserForm, ChangePasswordForm
+from .forms import LoginForm, UserForm, ChangePasswordForm
 from .models import cardRecipient, CustomUser
 
 
@@ -15,22 +15,33 @@ class MainView(TemplateView):
     def get_auth(self, request):
         return render(request, self.template_name)
 
-class LoginFormView(FormView):
-    form_class = AuthenticationForm
-    success_url = "login"
-    template_name = 'main/login.html'
-    
-    def form_valid(self, form):
-        self.user = form.get_user()
-        login(self.request, self.user)
-        return super(LoginFormView, self).form_valid(form)
-    
-    def form_invalid(self, form):
-        form.add_error(None, u'Неверное имя пользователя или пароль');
-        return super(LoginFormView, self).form_invalid(form)
+def login(request):
+    template_name = 'main/login'
+    user_name = ''
+    passWord = ''
+    action_detail = ''
+    if request.method == "POST":
+        form = LoginForm(request.POST)
+        if form.is_valid:
+            user_name = form.cleaned_data.get('user_name')
+            passWord = form.cleaned_data.get('passWord')
+            try:
+                user = CustomUser.objects.get(username=user_name, password=passWord)
+                # Необходимо авторизировать пользователя user
+                return redirect('/')
+            except:
+                action_detail = 'Неверное имя пользователя или пароль'
+    context={
+            'title': 'Войдите в аккаунт',
+            'form': form,
+            'action_detail': action_detail,
+        }
+    return(request, template_name, context)
 
-class LogoutView(TemplateView):
-    template_name = "main/logout.html"
+
+def logout(request):
+    # Необходимо осуществить выход из аккаунта
+    return redirect('/')
 
 def recipients(request):
     return render(request, 'main/recipients.html', {'title': 'Список проживающих'})
@@ -52,7 +63,9 @@ def all_specialists(request):
 def changepassword(request, customuser_id):
     current_user = CustomUser.objects.get(id=customuser_id)
     template_name = 'main/changepassword.html'
-    text_action = ''  
+    text_action = '' 
+    new_password = ''
+    r_new_password = '' 
     if request.method == "POST":
         form = ChangePasswordForm(request.POST)
         if form.is_valid:
@@ -73,6 +86,37 @@ def changepassword(request, customuser_id):
     }
     return render(request, template_name, context)
 
+def add_user(request):
+    template_name = 'main/add_user.html'
+    firstname=''
+    lastname=''
+    passWord=''
+    user_name = ''
+    if request.method == "POST":
+        form= UserForm(request.POST)
+        if form.is_valid():
+            user_name=form.cleaned_data.get("user_name")
+            firstname=form.cleaned_data.get("firstname")
+            lastname=form.cleaned_data.get("lastname")
+            passWord=form.cleaned_data.get("passWord")
+            new_user = CustomUser.objects.create(username=user_name,first_name=firstname, last_name=lastname, password=passWord, is_staff=True)
+            new_user.set_password(passWord)
+            new_user.save()
+            return redirect('/specialists/')
+    form = UserForm()
+    context ={
+        'title': 'Создание пользователя', 
+        'form': form,
+    }
+    return render(request, template_name, context)
+
+def delete(request, customuser_id):
+        try:
+            CustomUser.objects.filter(id=customuser_id).delete()        
+        except:
+            pass
+        return redirect('/specialists/')
+
 class UserView(TemplateView):
 
     template_name = 'main/some_specialist.html'    
@@ -89,59 +133,3 @@ class UserView(TemplateView):
         # from ... import User
         # user_data = User.object.get(id=request.GET.get('user_id'))
         # user_data = User.object.filter(...)
-
-    def post(self, request):
-        submitbutton = request.POST.get("OK")
-        firstname=''
-        lastname=''
-        passWord=''
-        user_name = ''
-        form= UserForm(request.POST)
-        if form.is_valid():
-            user_name=form.cleaned_data.get("user_name")
-            firstname=form.cleaned_data.get("firstname")
-            lastname=form.cleaned_data.get("lastname")
-            passWord=form.cleaned_data.get("passWord")
-            new_user = CustomUser.objects.create(username=user_name,first_name=firstname, last_name=lastname, password=passWord, is_staff=True)
-            new_user.set_password(passWord)
-            new_user.save()
-        # Создать пользователя по данным с фронта
-        # name = request.data.get('name')
-        # остальные поля пользователя
-        # user_to_create = User(name=name, phone=phone)
-        # Провалидировать данные - необязательно
-        # user_to_create.save()
-
-    def put( request, customuser_id):
-        template_name = 'main/changepassword.html'
-        current_user = CustomUser.objects.filter(id=customuser_id)
-        form = ChangePasswordForm(request.POST or None)
-        submitbutton = request.POST.get("OK")
-        new_password = ''
-        r_new_password = ''
-        if request.method == "POST":
-            if form.is_valid:
-                new_password=form.cleaned_data.get("new_password")
-                r_new_password=form.cleaned_data.get("retype_new_password")
-            if new_password==r_new_password:
-                current_user.set_password(new_password)
-                current_user.save()
-                messages.INFO("Пароль успешно изменен")
-            else:
-                messages.INFO("Пароли не совпадают")
-        else:
-            form = ChangePasswordForm()
-        context = {
-            'title': 'Смена пароля',
-        }
-        return render(request, template_name, context)
-        # user_to_update = User.object.get(id=request.GET.get('user_id'))
-        # user_to_update.name = request.data.get('name')
-        # user_to_update.save()
-    
-    def delete(self, request, customuser_id):
-        try:
-            CustomUser.objects.filter(id=customuser_id).delete()     
-            messages.INFO(request,"Успешно удален")       
-        except:
-            messages.INFO(request,"Пользователь с таким именем не существует")

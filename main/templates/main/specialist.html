@@ -4,7 +4,10 @@
 
 {% block content %}
     {% if user.is_authenticated %}
-        <h1>Специалисты</h1>
+        <div>
+            <h1 class="h_specialist">Специалисты</h1>
+            <span><a href="{% url 'main:add_specialist' %}"><button class="btn btn-info"><i class="fas fa-plus-circle">Добавить специалиста</i></a></span>
+        </div>
         <ul>
         {% for elem in context %}
             <li><a href="{% url 'main:some_specialist' elem.id %}">{{ elem.first_name }} {{ elem.last_name }}</a></li>
