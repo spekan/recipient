@@ -10,7 +10,7 @@
         </div>
         <ul>
         {% for elem in context %}
-            <li><a href="{% url 'main:some_specialist' elem.id %}">{{ elem.first_name }} {{ elem.last_name }}</a></li>
+            <li><a href="{% url 'main:some_recipients' elem.id %}">{{ elem.first_name }} {{ elem.last_name }}</a></li>
         {% endfor %}
         </ul>
     {% endif %}

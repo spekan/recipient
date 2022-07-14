@@ -1,0 +1,19 @@
+{% extends 'main/layout.html' %}
+
+{% block title %}{{ card.fio }}{% endblock title %}
+
+{% block content %}
+    {% if user.is_authenticated %}
+        <h1 align="center">{{ card.fio }}</h1>
+        <h3>Дата рождения: {{ card.date_of_birthsday }}</h3>
+        <form target="_blank">
+            <input type="button" onclick="history.back();" value="Назад"/>
+            {% if user.is_staff %}
+                <input type="button" onclick="document.location='edit'" value="Редактировать карточку"/>
+            {% endif%}
+            {% if user.is_superuser %}
+                <input type="button" onclick="document.location='delete'" value="Удалить специалиста"/>
+            {% endif%}
+        </form>
+    {% endif %}
+{% endblock content %}

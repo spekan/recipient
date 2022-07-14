@@ -4,20 +4,14 @@
 
 {% block content %}
     {% if user.is_authenticated %}
-    <table border="1">
-        <caption>Список клиентов</caption>
-        <tr>
-            <th>ФИО</th>
-            <th>Пол</th>
-            <th>Дата обращения</th>
-        </tr>
-    {% for elem in cardRecipient%}
-    <tr>
-        <td>{{elem.fio}}</td>
-        <td>{{elem.gender}}</td>
-        <td>{{elem.date_of_appeal}}</td>
-    </tr>    
-    {% endfor %}
-    </table>
+        <div>
+            <h1 class="h_specialist">Специалисты</h1>
+            <span><a href="{% url 'main:add_recipients' %}"><button class="btn btn-info"><i class="fas fa-plus-circle">Добавить карточку клиента</i></a></span>
+        </div>
+        <ul>
+        {% for elem in context %}
+            <li><a href="{% url 'main:some_specialist' elem.id %}">{{ elem.fio }} {{ elem.date_of_birthsday }}</a></li>
+        {% endfor %}
+        </ul>
     {% endif %}
 {% endblock content %}

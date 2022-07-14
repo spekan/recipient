@@ -1,0 +1,65 @@
+{% extends 'main/layout.html' %}
+
+{% block title %} {{ title }} {% endblock %}
+{% block content %}
+    <body class="change">
+        <div class="features">
+            <h1 class="change">Добавьте карточку клиента</h1>
+            <form class="change" action="" method="post">
+                {% csrf_token %}
+                <b>ФИО</b><br>
+                {{ form.fio }}<br>
+                <b>Пол</b><br>
+                {{ form.gender }}<br>
+                <b>Дата рождения</b><br>
+                {{ form.date_of_birthsday }}<br>
+                <b>Дата обращения</b><br>
+                {{ form.date_of_appeal }}<br>
+                <b>Дата выселения</b><br>
+                {{ form.date_end }}<br>
+                <b>Проживание</b><br>
+                {{ form.residence }}<br>
+                <b>Специалист, закрепленный за клиентом</b><br>
+                {{ form.specialist }}<br>
+                <b>Дата последней флюорографии</b><br>
+                {{ form.fluorography }}<br>
+                <b>Причина расторжения договора</b><br>
+                {{ form.reason_end }}<br>
+                <b>Период временной регистрации с</b><br>
+                {{ form.period_time_begin }}<br>
+                <b>Период временной регистрации до</b><br>
+                {{ form.period_time_end }}<br>
+                <b>Социальный статус</b><br>
+                {{ form.social_status }}<br>
+                <b>МЛС</b><br>
+                {{ form.mls }}<br>
+                <b>МЛС с</b><br>
+                {{ form.mls_begin }}<br>
+                <b>МЛС до</b><br>
+                {{ form.mls_end }}<br>
+                <b>Инвалидность</b><br>
+                {{ form.disabled }}<br>
+                <b>Возраст инвалида</b><br>
+                {{ form.age_disabled }}<br>
+                <b>Пенсионер</b><br>
+                {{ form.pensioner }}<br>
+                <b>Возраст пенсионера</b><br>
+                {{ form.age_pensioner }}<br>
+                <b>Наркология</b><br>
+                {{ form.narkology }}<br>
+                <b>ПНД</b><br>
+                {{ form.pnd }}<br>
+                <b>Занятость</b><br>
+                {{ form.employment }}<br>
+                <b>Номер комнаты</b><br>
+                {{ form.number_room }}<br>
+                <b>Фото</b><br>
+                {{ form.photo }}<br>
+                <b>Примечание</b><br>
+                {{ form.comment }}<br>
+                <span>{{ text_action }}</span>
+                <button class="btn btn-success" type="submit">Добавить</button>
+            </form>
+        </div>
+    </body>
+{% endblock %}

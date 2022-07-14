@@ -51,7 +51,7 @@ class cardRecipientForm(forms.Form):
         ('МЛС', 'МЛС'),
     )
     disableChoices=(
-        ('НЕТ', 'НЕТ')
+        ('НЕТ', 'НЕТ'),
         ('ИНВ 1гр', 'ИНВ 1гр'),
         ('ИНВ 2гр', 'ИНВ 2гр'),
         ('ИНВ 3гр', 'ИНВ 3гр'),
@@ -82,11 +82,12 @@ class cardRecipientForm(forms.Form):
         ('Не работает', 'Не работает'),
     )
     fio = forms.CharField(required=True, max_length=20, widget=TextInput(attrs={'type':'text','class': 'form-control'}))
+    date_of_birthsday = forms.DateField(required=True, widget=DateInput(attrs={'class':'form=control'}))
     gender = forms.ChoiceField(required=True, choices=genderChoices)
     date_of_appeal = forms.DateField(required=True, widget=DateInput(attrs={'class':'form=control'}))
     date_end = forms.DateField(required=False, widget=DateInput(attrs={'class':'form=control'}))
     residence = forms.ChoiceField(required=True, choices=residenceChoices)
-    specialist = forms.ChoiceField(required=True, choices=CustomUser.last_name)
+    specialist = forms.ModelChoiceField(required=True, queryset=CustomUser.objects.filter().values('last_name'))
     fluorography = forms.DateField(required=True, widget=DateInput(attrs={'class':'form=control'}))
     reason_end = forms.ChoiceField(required=True, choices=reasonChoices)
     period_time_begin = forms.DateField(required=True, widget=DateInput(attrs={'class':'form=control'}))
@@ -107,7 +108,7 @@ class cardRecipientForm(forms.Form):
     comment = forms.CharField(required=False, widget=Textarea(attrs={'class': 'form-control'}))
     class Meta:
         fields = [
-            'fio','gender','date_of_appeal','date_end','residence','specialist','fluorography','reason_end',
-            'period_time_begin','period_time_end','social_status','mls','mls_begin','mls_end','disabled','age_disabled',
-            'pensioner','age_pensioner','narkology','pnd','employment','number_room','comment',
+            'fio','date_of_birthsday','gender','date_of_appeal','date_end','residence','specialist','fluorography',
+            'reason_end','period_time_begin','period_time_end','social_status','mls','mls_begin','mls_end','disabled',
+            'age_disabled','pensioner','age_pensioner','narkology','pnd','employment','number_room','comment',
             ]

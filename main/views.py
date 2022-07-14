@@ -5,7 +5,7 @@ from django.views.generic import TemplateView
 from django.views.generic.edit import FormView
 from django.contrib.messages import constants as messages
 from django.http import Http404
-from .forms import LoginForm, UserForm, ChangePasswordForm
+from .forms import LoginForm, UserForm, ChangePasswordForm, cardRecipientForm
 from .models import cardRecipient, CustomUser
 
 
@@ -15,32 +15,32 @@ class MainView(TemplateView):
     def get_auth(self, request):
         return render(request, self.template_name)
 
-def login(request):
-    template_name = 'main/login'
-    user_name = ''
-    passWord = ''
+def login_view(request):
+    template_name = 'main/login.html'
     action_detail = ''
     if request.method == "POST":
         form = LoginForm(request.POST)
-        if form.is_valid:
-            user_name = form.cleaned_data.get('user_name')
-            passWord = form.cleaned_data.get('passWord')
-            try:
-                user = CustomUser.objects.get(username=user_name, password=passWord)
-                # Необходимо авторизировать пользователя user
+        if form.is_valid():
+            username = form.cleaned_data.get('user_name')
+            password = form.cleaned_data.get('passWord')
+            user = authenticate(request, username=username, password=password)
+            if user is not None:
+                login(request, user)
                 return redirect('/')
-            except:
+            else:
                 action_detail = 'Неверное имя пользователя или пароль'
+    else:
+        form = LoginForm()
     context={
-            'title': 'Войдите в аккаунт',
+            'title': 'Вход в аккаунт',
             'form': form,
             'action_detail': action_detail,
         }
-    return(request, template_name, context)
+    return render(request, template_name, context)
 
 
-def logout(request):
-    # Необходимо осуществить выход из аккаунта
+def logout_view(request):
+    logout(request)
     return redirect('/')
 
 def recipients(request):
@@ -56,7 +56,8 @@ def report(request):
 def all_specialists(request):
         user_name = CustomUser.objects.values('id','first_name', 'last_name')
         context={
-            'context': user_name
+            'context': user_name,
+            'title': 'Пользователи'
         }
         return render(request, 'main/specialist.html', context=context)
 
@@ -68,17 +69,17 @@ def changepassword(request, customuser_id):
     r_new_password = '' 
     if request.method == "POST":
         form = ChangePasswordForm(request.POST)
-        if form.is_valid:
+        if form.is_valid():
             new_password=form.cleaned_data.get('new_password')
             r_new_password=form.cleaned_data.get('retype_new_password')
             if new_password==r_new_password:
                 current_user.set_password(new_password)
                 current_user.save()
-                messages.INFO("Пароль успешно изменен")
                 return redirect('/specialists/')
             else:
                 text_action = "Пароли не совпадают"
-    form = ChangePasswordForm()
+    else:
+        form = ChangePasswordForm()
     context ={
         'title': 'Смена пароля', 
         'form': form,
@@ -103,9 +104,10 @@ def add_user(request):
             new_user.set_password(passWord)
             new_user.save()
             return redirect('/specialists/')
-    form = UserForm()
+    else:
+        form = UserForm()
     context ={
-        'title': 'Создание пользователя', 
+        'title': 'Добавление клиента', 
         'form': form,
     }
     return render(request, template_name, context)
@@ -117,6 +119,44 @@ def delete(request, customuser_id):
             pass
         return redirect('/specialists/')
 
+def all_recipients(request):
+    template_name = 'main/recipients.html'
+    clients = cardRecipient.objects.values('id', 'fio', 'date_of_birthsday')
+    context={
+        'context': clients,
+        'title': 'Получатели социальных услуг',
+    }
+    return render(request, template_name, context)
+
+def add_cardRecipient(request):
+    template_name = 'main/add_card.html'
+    if request.method == "POST":
+        form= cardRecipientForm(request.POST)
+        if form.is_valid():
+            cd = form.cleaned_data
+            new_card = cardRecipient.objects.create(fio= cd['fio'],date_of_birthsday=cd['date_of_birthsday'],gender=cd['gender'],date_of_appeal=cd['date_of_appeal'],
+            date_end=cd['date_end'],residence= cd['residence'],specialist=cd['specialist'],fluorography=cd['fluorography'],reason_end= cd['reason_end'],
+            period_time_begin=cd['period_time_begin'],period_time_end=cd['period_time_end'],social_status=cd['social_status'],mls=cd['mls'],mls_begin=cd['mls_begin'],
+            mls_end=cd['mls_end'],disabled=cd['disabled'],age_disabled=cd['age_disabled'],pensioner=cd['pensioner'],age_pensioner=cd['age_pensioner'],
+            narkology=cd['narkology'],pnd=cd['pnd'],employment=cd['employment'],number_room=cd['number_room'],comment=cd['comment'])
+            new_card.save()
+            return redirect('/recipients/')
+    else:
+        form = cardRecipientForm()
+    context ={
+        'title': 'Добавление клиента', 
+        'form': form,
+    }
+    return render(request, template_name, context)
+
+def get_r(request, cardrecipient_id):
+    template_name = 'main/some_recipients.html'
+    try:
+        card = cardRecipient.objects.get(pk=cardrecipient_id)
+    except cardRecipient.DoesNotExist:
+        raise Http404("Клиент не найден")
+    return render(request, template_name, {'card': card})
+
 class UserView(TemplateView):
 
     template_name = 'main/some_specialist.html'    
@@ -127,9 +167,3 @@ class UserView(TemplateView):
         except CustomUser.DoesNotExist:
             raise Http404("Пользователь не найден")
         return render(request, UserView.template_name, {'user_name': user_name})
-        # Вернуть информацэто шифраию о юзере если был передан id юзера
-        # Иначе вернуть список всех юзеров и информацию о них
-        # ПОдробнее в Django ORM get/filter
-        # from ... import User
-        # user_data = User.object.get(id=request.GET.get('user_id'))
-        # user_data = User.object.filter(...)

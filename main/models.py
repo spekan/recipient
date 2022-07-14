@@ -59,6 +59,7 @@ class cardRecipient(models.Model):
         c1 = 'Работает', _('Работает')
         c2 = 'Не работает', _('Не работает')
     fio = models.CharField(max_length=80, blank=False, null=True)
+    date_of_birthsday = models.DateField(blank=False, null=True)
     gender = models.CharField(max_length=1, choices=genderChoices.choices, default=genderChoices.c1)
     date_of_appeal = models.DateField(blank=False, null=True)
     date_end = models.DateField(blank=True, null=True)
